@@ -41,10 +41,67 @@ const TOUCH_CONTROLS: ReadonlyArray<readonly [string, string]> = [
   ['PAUSE / SETTINGS', '❚❚'],
 ]
 
+/** Run-structure readout under the title: rounds, enemy roster, final target. */
+function MissionIntel() {
+  const cells: ReadonlyArray<readonly [string, string]> = [
+    ['ROUNDS', String(WAVES.length).padStart(2, '0')],
+    ['HOSTILE CLASSES', '05'],
+    ['FINAL TARGET', 'A.G.I.'],
+  ]
+  return (
+    <div className="flex items-stretch gap-3 max-sm:gap-2">
+      {cells.map(([label, value]) => (
+        <HudPanel key={label} className="flex w-28 flex-col items-center gap-1 px-2 py-2 max-sm:w-24">
+          <span className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground">{label}</span>
+          <span className="font-mono text-lg leading-none font-bold tracking-[0.14em] text-amber-200">{value}</span>
+        </HudPanel>
+      ))}
+    </div>
+  )
+}
+
+const BOOT_LINES: readonly string[] = [
+  'OPTICS ARRAY ........ ONLINE',
+  'DODGE DRIVE ......... ONLINE',
+  'WEAPONS BUS ......... ONLINE',
+  'PERIMETER NET ....... ONLINE',
+  'TARGET: A.G.I. ...... LOCKED',
+]
+
+/** Fake terminal boot sequence: lines type in, then hold on the ready state. */
+function BootLog() {
+  const [shown, setShown] = useState(0)
+  useEffect(() => {
+    if (shown >= BOOT_LINES.length) return
+    const t = setTimeout(() => setShown((n) => n + 1), shown === 0 ? 420 : 460)
+    return () => clearTimeout(t)
+  }, [shown])
+  const done = shown >= BOOT_LINES.length
+  return (
+    <HudPanel accent="border-emerald-300/40" className="w-[22rem] max-w-[86vw] px-4 py-3">
+      <div className="flex min-h-[6.5rem] flex-col gap-1 font-mono text-[10px] tracking-[0.18em] max-sm:min-h-[6rem] max-sm:text-[9px]">
+        <span className="text-muted-foreground/70">{'/// SYSTEM CHECK'}</span>
+        {BOOT_LINES.slice(0, shown).map((line) => (
+          <span key={line} className="animate-in fade-in slide-in-from-left-1 text-emerald-300/85 duration-200">
+            {line}
+          </span>
+        ))}
+        {done ? (
+          <span className="animate-in fade-in text-amber-300/90 duration-300">
+            ALL SYSTEMS NOMINAL — AWAITING ENGAGE
+          </span>
+        ) : (
+          <span aria-hidden className="hud-blink text-emerald-300/85">█</span>
+        )}
+      </div>
+    </HudPanel>
+  )
+}
+
 export function MenuScreen() {
   const bindings = useSettings((s) => s.bindings)
   const CONTROLS = controlRows(bindings)
-  const [manualOpen, setManualOpen] = useState(true)
+  const [manualOpen, setManualOpen] = useState(false)
   const start = () => {
     uiClick()
     useGame.getState().startGame()
@@ -52,19 +109,34 @@ export function MenuScreen() {
   return (
     <div
       className="pointer-events-auto absolute inset-0 flex items-center-safe justify-center overflow-y-auto pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]"
-      style={{ background: 'linear-gradient(to bottom, rgba(11,14,26,0.85), rgba(11,14,26,0.35) 42%, rgba(11,14,26,0.88))' }}
+      style={{ background: 'linear-gradient(to bottom, rgba(11,14,26,0.88), rgba(11,14,26,0.4) 42%, rgba(11,14,26,0.9))' }}
     >
-      <div className="animate-in fade-in slide-in-from-bottom-4 flex flex-col items-center gap-6 py-8 duration-700 max-sm:gap-4 max-sm:py-6">
+      {/* drifting terminal scanlines over the whole menu */}
+      <div
+        aria-hidden
+        className="hud-scan-drift pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.95) 0 1px, transparent 1px 4px)' }}
+      />
+      <div className="animate-in fade-in slide-in-from-bottom-4 relative flex flex-col items-center gap-5 py-8 duration-700 max-sm:gap-4 max-sm:py-6">
         <div className="flex flex-col items-center gap-2.5">
-          <span className="font-mono text-[10px] tracking-[0.5em] text-amber-300/80 max-sm:tracking-[0.26em]">{'/// PERIMETER DEFENSE TERMINAL v2.7'}</span>
+          <span className="font-mono text-[10px] tracking-[0.5em] text-amber-300/80 max-sm:tracking-[0.26em]">{'/// PERIMETER DEFENSE TERMINAL v3.0'}</span>
           <GlitchText
             text="ATTACK AGI"
             className="font-mono text-6xl font-black tracking-[0.14em] text-foreground drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] max-sm:text-4xl md:text-8xl"
+          />
+          {/* amber caution stripe marching under the logo */}
+          <div
+            aria-hidden
+            className="hud-march h-1 w-72 max-w-[60vw] opacity-80"
+            style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgba(252,211,77,0.9) 0 10px, transparent 10px 20px)' }}
           />
           <span className="text-center font-mono text-xs tracking-[0.32em] text-muted-foreground max-sm:text-[9px] max-sm:tracking-[0.18em]">
             SURVIVE THE WAVES · UNPLUG THE MACHINE
           </span>
         </div>
+
+        <MissionIntel />
+        <BootLog />
 
         <Collapsible
           open={manualOpen}
@@ -116,7 +188,7 @@ export function MenuScreen() {
         <Button
           size="lg"
           onClick={start}
-          className="h-13 border border-red-400/40 bg-red-600 px-14 font-mono text-lg font-bold tracking-[0.4em] text-white shadow-lg shadow-red-900/60 hover:bg-red-500"
+          className="hud-engage h-13 border border-red-400/40 bg-red-600 px-14 font-mono text-lg font-bold tracking-[0.4em] text-white hover:bg-red-500"
         >
           ENGAGE
         </Button>
