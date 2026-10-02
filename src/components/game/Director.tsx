@@ -13,10 +13,10 @@ import type { EnemyKind } from '@/game/types'
 import { world } from '@/game/world'
 import { animateCrate, makeCrate, type CrateVis } from './Director.crate'
 
-// Director — game flow. Owns the phase machine (wave 1..5 → buffSelect → smash),
-// wave composition + drip-feeding drop requests to the AGI, wave-clear detection,
-// buff offers, run restarts (sole caller of world.reset()), and ammo-crate
-// spawning / rendering / pickup. Runs first every frame (FRAME_PRIO.director).
+// Director — game flow. Owns the phase machine (wave 1..WAVES.length → buffSelect
+// → smash), wave composition + drip-feeding drop requests to the AGI, wave-clear
+// detection, buff offers, run restarts (sole caller of world.reset()), and
+// ammo-crate spawning / rendering / pickup. Runs first every frame (FRAME_PRIO.director).
 
 // ─── Spawn-placement tuning (directives local to the Director, not in constants) ─
 const SPAWN_R_MIN = 8 // enemy drop polar radius range

@@ -12,7 +12,7 @@ function computeStats(buffs: OwnedBuffs): PlayerStats {
   return {
     maxHp: PLAYER_HP + 25 * n('plating'),
     moveSpeedMult: 1 + 0.12 * n('fleetFooted'),
-    // floor 1.2s: with 0.38s i-frames, anything lower makes stacked Phantom
+    // floor 1.2s: with 0.34s i-frames, anything lower makes stacked Phantom
     // Step a near-permanent invulnerability loop (and trivializes the death beam)
     dodgeCooldown: Math.max(1.2, DODGE_COOLDOWN - 0.6 * n('phantomStep')),
     pistolDamage: PISTOL_DAMAGE * (1 + 0.4 * n('hollowPoints')),
@@ -31,7 +31,7 @@ function computeStats(buffs: OwnedBuffs): PlayerStats {
 
 interface GameState {
   phase: GamePhase
-  wave: number // 1..5, valid during wave/buffSelect
+  wave: number // 1..WAVES.length, valid during wave/buffSelect
   enemiesRemaining: number // yet-to-kill in current wave (spawned + unspawned)
   kills: number
   hp: number
