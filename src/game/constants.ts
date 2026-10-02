@@ -102,23 +102,25 @@ export const STRAGGLER_OUTLINE_COUNT = 5
 // fight and difficulty comes from composition, not body count. More rounds
 // also means more buff picks per run (one after every clear).
 export const WAVES: ReadonlyArray<readonly [number, number, number, number, number]> = [
-  [8, 4, 0, 0, 0],
-  [9, 5, 2, 0, 2],
-  [8, 6, 3, 2, 3],
-  [8, 6, 4, 3, 4],
-  [7, 7, 5, 3, 5],
-  [7, 8, 5, 4, 6],
-  [6, 8, 6, 5, 6],
-  [6, 9, 7, 5, 7],
+  [9, 5, 0, 0, 0],
+  [10, 6, 2, 0, 2],
+  [9, 7, 4, 2, 4],
+  [9, 7, 5, 3, 5],
+  [8, 8, 6, 4, 6],
+  [8, 9, 6, 5, 7],
+  [7, 9, 7, 6, 7],
+  [7, 10, 8, 6, 8],
 ]
 export const DROP_BATCH = 4 // enemies per AGI hand drop
 export const DROP_INTERVAL = 3.2 // seconds between drop requests while under cap
 
 // ─── Boss ────────────────────────────────────────────────────────────────────
 export const BOSS_HP = 1100
+export const BOSSFIGHT_HP = 1900
 export const SMASH_WARN_TIME = 4.0 // ground glows red + JUMP! countdown before impact
 export const SMASH_DAMAGE = 40 // (unused by the smash itself — it instakills; kept for tuning experiments)
 export const BOSS_TIRED_TIME = 7.0
+export const BOSSFIGHT_TIRED_TIME = 5.5
 export const BOSS_PATTERNS_PER_CYCLE = 3
 export const PUNCH_HAND_HP_LIMIT = 60 // max damage extractable per lingering hand
 export const PUNCH_DAMAGE = 30

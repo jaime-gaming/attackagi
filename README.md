@@ -2,7 +2,7 @@
 
 **Survive the waves. Unplug the machine.**
 
-A fast-paced first-person 3D horde shooter with roguelike buff picks, running entirely in the browser. Fight through eight short waves of robots dropped in by a skyscraper-sized AGI with a CRT monitor for a head — then it stops delegating and comes for you itself, bullet-hell style.
+A fast-paced first-person 3D horde shooter with roguelike buff picks, running entirely in the browser. Fight through eight short waves of robots dropped in by a skyscraper-sized AGI with a CRT monitor for a head — then it stops delegating and comes for you itself, bullet-hell style. Beat the campaign to unlock Endless, Custom and Bossfight+ modes.
 
 ![Attack AGI — the boss hovering over the rooftop arena](docs/screenshot.jpg)
 
@@ -12,6 +12,8 @@ A fast-paced first-person 3D horde shooter with roguelike buff picks, running en
 - **Weapons**: a full-auto revolver with a red-dot sight and ADS, a chargeable baseball bat, and molotovs with a fire that does not care whose side you're on.
 - **Enemies**: melee bots, rangers, shield tanks, laser snipers, and purple dive-bomber drones that strafe you at 15 m/s. Every robot has a glowing logo screen for a head — hit it for 2× headshot damage.
 - **Roguelike buffs**: clear a wave, pick 1 of 3 random upgrades, stack a build across the run.
+- **Extra modes** (unlocked after the campaign): **Endless** escalates forever, **Custom** lets you choose enemies per class, round count and whether to fight the boss, and **Bossfight+** skips to a tougher, extended AGI battle with an extra shockwave attack.
+- **Bigger rounds**: campaign waves now contain a few additional enemies while preserving the existing drip-feed cap.
 - **The boss fight**: after the last wave the AGI smashes the arena flat (jump or die — literally), then cycles five telegraphed bullet-hell patterns — rocket barrages, a double instakill death beam, miniguns, hand slams, beam-wall barrages — with tired windows where its head and hands come down into batting range.
 - **Runs on anything**: graphics quality tiers with an adaptive auto mode, instanced crowd rendering, and full mobile/touch support.
 

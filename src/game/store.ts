@@ -3,9 +3,9 @@ import { create } from 'zustand'
 import {
   BAT_CHARGE_TIME, BAT_DAMAGE, BUFFS, DODGE_COOLDOWN, MOLOTOV_CAPACITY, MOLOTOV_RADIUS,
   MOLOTOV_START, PISTOL_DAMAGE, PISTOL_FIRE_INTERVAL, PISTOL_MAG, PISTOL_RELOAD,
-  PISTOL_RESERVE_START, PLAYER_HP, BOSS_HP, type BuffId,
+  PISTOL_RESERVE_START, PLAYER_HP, BOSS_HP, BOSSFIGHT_HP, type BuffId,
 } from './constants'
-import type { GamePhase, OwnedBuffs, PlayerStats, WeaponSlot } from './types'
+import type { CustomRunConfig, GameMode, GamePhase, OwnedBuffs, PlayerStats, WeaponSlot } from './types'
 
 function computeStats(buffs: OwnedBuffs): PlayerStats {
   const n = (id: BuffId) => buffs[id] ?? 0
@@ -31,6 +31,8 @@ function computeStats(buffs: OwnedBuffs): PlayerStats {
 
 interface GameState {
   phase: GamePhase
+  mode: GameMode
+  customConfig: CustomRunConfig
   wave: number // 1..WAVES.length, valid during wave/buffSelect
   enemiesRemaining: number // yet-to-kill in current wave (spawned + unspawned)
   kills: number
@@ -55,7 +57,7 @@ interface GameState {
 
   // actions
   set: (partial: Partial<GameState>) => void
-  startGame: () => void
+  startGame: (mode?: GameMode, customConfig?: CustomRunConfig) => void
   restart: () => void
   pause: () => void
   resume: () => void
@@ -65,10 +67,19 @@ interface GameState {
   chooseBuff: (id: BuffId) => void
 }
 
-const initialRun = () => {
+const DEFAULT_CUSTOM_CONFIG: CustomRunConfig = {
+  enemyCounts: [10, 5, 2, 1, 2],
+  waves: 3,
+  boss: true,
+}
+
+const initialRun = (mode: GameMode = 'campaign', customConfig = DEFAULT_CUSTOM_CONFIG) => {
   const stats = computeStats({})
+  const bossMaxHp = mode === 'bossfight' ? BOSSFIGHT_HP : BOSS_HP
   return {
     phase: 'menu' as GamePhase,
+    mode,
+    customConfig: { ...customConfig, enemyCounts: [...customConfig.enemyCounts] as CustomRunConfig['enemyCounts'] },
     wave: 0,
     enemiesRemaining: 0,
     kills: 0,
@@ -84,8 +95,8 @@ const initialRun = () => {
     ownedBuffs: {} as OwnedBuffs,
     buffChoices: null,
     stats,
-    bossHp: BOSS_HP,
-    bossMaxHp: BOSS_HP,
+    bossHp: bossMaxHp,
+    bossMaxHp,
     bossBarVisible: false,
     warning: null,
     pausedFrom: null as GamePhase | null,
@@ -98,9 +109,26 @@ export const useGame = create<GameState>((set, get) => ({
 
   set: (partial) => set(partial),
 
-  startGame: () => set({ phase: 'wave', wave: 1 }),
+  startGame: (mode = 'campaign', customConfig = get().customConfig) => {
+    const fresh = initialRun(mode, customConfig)
+    set({
+      ...fresh,
+      runId: get().runId + 1,
+      phase: mode === 'bossfight' ? 'smash' : 'wave',
+      wave: mode === 'bossfight' ? 0 : 1,
+    })
+  },
 
-  restart: () => set({ ...initialRun(), runId: get().runId + 1, phase: 'wave', wave: 1 }),
+  restart: () => {
+    const { mode, customConfig, runId } = get()
+    const fresh = initialRun(mode, customConfig)
+    set({
+      ...fresh,
+      runId: runId + 1,
+      phase: mode === 'bossfight' ? 'smash' : 'wave',
+      wave: mode === 'bossfight' ? 0 : 1,
+    })
+  },
 
   pause: () => {
     const { phase } = get()
